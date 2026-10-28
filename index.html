@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Experto: Marketing Digital (Prolog)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --border: #334155;
+      --bubble-bot: #1e293b;
+      --bubble-user: #0369a1;
+      --bubble-why: #854d0e;
+      --badge-success: #166534;
+      --badge-alert: #991b1b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 860px;
+      height: 90vh;
+      background-color: #111827;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    /* Header */
+    .chat-header {
+      padding: 16px 20px;
+      background-color: #1f2937;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-header h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-header .badge {
+      background-color: #0284c7;
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-reset {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+      background-color: #374151;
+      color: #fff;
+    }
+
+    /* Messages Area */
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+    }
+
+    .msg {
+      max-width: 85%;
+      padding: 14px 18px;
+      border-radius: 14px;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-bot {
+      align-self: flex-start;
+      background-color: var(--bubble-bot);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg-user {
+      align-self: flex-end;
+      background-color: var(--bubble-user);
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-why {
+      align-self: flex-start;
+      background-color: #3b2a09;
+      border: 1px solid #a16207;
+      color: #fef08a;
+      border-radius: 12px;
+      font-size: 0.9rem;
+    }
+
+    .msg-result {
+      align-self: center;
+      width: 100%;
+      max-width: 760px;
+      background-color: #172554;
+      border: 1px solid #2563eb;
+      border-radius: 14px;
+      padding: 20px;
+    }
+
+    .msg-result h2 {
+      font-size: 1.25rem;
+      color: #38bdf8;
+      margin-bottom: 8px;
+    }
+
+    .score-pill {
+      display: inline-block;
+      padding: 4px 12px;
+      background-color: #0284c7;
+      color: white;
+      border-radius: 9999px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
+    .how-section {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px dashed #3b82f6;
+      font-size: 0.88rem;
+    }
+
+    .how-list {
+      list-style: none;
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .how-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .how-list .check { color: #4ade80; }
+    .how-list .cross { color: #f87171; }
+
+    /* Controls & Input */
+    .chat-controls {
+      padding: 14px 20px;
+      background-color: #1f2937;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-action:active {
+      transform: scale(0.98);
+    }
+
+    .btn-yes {
+      background-color: #15803d;
+      color: white;
+    }
+    .btn-yes:hover { background-color: #16a34a; }
+
+    .btn-no {
+      background-color: #b91c1c;
+      color: white;
+    }
+    .btn-no:hover { background-color: #dc2626; }
+
+    .btn-why {
+      background-color: #b45309;
+      color: white;
+      max-width: 140px;
+    }
+    .btn-why:hover { background-color: #d97706; }
+
+    .input-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-form input {
+      flex: 1;
+      padding: 10px 16px;
+      background-color: #111827;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .input-form input:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-send {
+      background-color: var(--primary);
+      color: #0f172a;
+      border: none;
+      font-weight: 600;
+      padding: 0 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn-send:hover { background-color: var(--primary-hover); color: white; }
+
+    .tag-prolog {
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+  </style>
+
+  <!-- Tau-Prolog JS Engine -->
+  <script src="js/tau-prolog.js"></script>
+  <script src="js/lists.js"></script>
+</head>
+<body>
+
+  <div class="chat-container">
+    <header class="chat-header">
+      <div>
+        <h1>🎯 Sistema Experto de Marketing Digital <span class="badge">Tau-Prolog Core</span></h1>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+          Motor con Scoring de Incertidumbre y Auditoría "Why / How"
+        </p>
+      </div>
+      <button class="btn-reset" onclick="iniciarSesion()">🔄 Reiniciar</button>
+    </header>
+
+    <main class="chat-messages" id="chatArea"></main>
+
+    <footer class="chat-controls">
+      <div class="quick-actions" id="quickActions">
+        <button class="btn-action btn-yes" onclick="enviarRespuesta('si')">👍 Sí</button>
+        <button class="btn-action btn-no" onclick="enviarRespuesta('no')">👎 No</button>
+        <button class="btn-action btn-why" onclick="enviarRespuesta('porque')">❓ ¿Por qué?</button>
+      </div>
+      <form class="input-form" onsubmit="event.preventDefault(); enviarTextoLibre();">
+        <input type="text" id="userInput" placeholder="Escribe 'si', 'no', o 'porque'..." autocomplete="off">
+        <button type="submit" class="btn-send">Enviar</button>
+      </form>
+    </footer>
+  </div>
+
+  <script>
+    // =========================================================================
+    // BASE DE CONOCIMIENTO (PROLOG)
+    // =========================================================================
+    const CODIGO_PROLOG = ":- dynamic(conocido/2).\n\n\n% =============================================================================\n% BASE DE CONOCIMIENTO: ESTRATEGIAS Y RECOMENDACIONES DE MARKETING DIGITAL\n% =============================================================================\n% Hechos declarativos puros y reglas de negocio sobre marketing digital.\n% Desacoplado de la lógica de inferencia, scoring o interacción de usuario.\n% =============================================================================\n\n% -----------------------------------------------------------------------------\n% regla(IdEstrategia, ListaCriterios)\n% Cada estrategia define los criterios ideales requeridos para su aplicación.\n% -----------------------------------------------------------------------------\nregla(campanas_google_search_y_sem, [\n    objetivo_ventas_directas,\n    presupuesto_medio_o_alto,\n    publico_con_alta_intencion_compra\n]).\n\nregla(publicidad_redes_sociales_meta_ads, [\n    objetivo_visibilidad_y_alcance,\n    producto_visualmente_atractivo,\n    audiencia_joven_o_general\n]).\n\nregla(marketing_de_contenidos_y_seo, [\n    objetivo_posicionamiento_largo_plazo,\n    presupuesto_bajo_o_limitado,\n    capacidad_creacion_contenido\n]).\n\nregla(email_marketing_y_fidelizacion, [\n    objetivo_retencion_y_recompra,\n    posee_base_datos_clientes,\n    producto_recompra_recurrente\n]).\n\nregla(marketing_de_influencers_microinfluencers, [\n    objetivo_visibilidad_y_alcance,\n    producto_visualmente_atractivo,\n    presupuesto_medio_o_alto\n]).\n\nregla(inbound_marketing_y_lead_nurturing, [\n    objetivo_ventas_directas,\n    ciclo_de_venta_largo,\n    capacidad_creacion_contenido\n]).\n\n% -----------------------------------------------------------------------------\n% descripcion_estrategia(IdEstrategia, NombreLegible, AccionRecomendada)\n% -----------------------------------------------------------------------------\ndescripcion_estrategia(\n    campanas_google_search_y_sem,\n    'Google Ads (Búsqueda / SEM)',\n    'Capturar clientes que ya están buscando activamente tus productos o servicios mediante anuncios en motores de búsqueda.'\n).\n\ndescripcion_estrategia(\n    publicidad_redes_sociales_meta_ads,\n    'Social Ads (Meta / Instagram & Facebook)',\n    'Generar demanda y reconocimiento de marca a través de campañas segmentadas de imágenes y videos cortos.'\n).\n\ndescripcion_estrategia(\n    marketing_de_contenidos_y_seo,\n    'SEO Orgánico y Marketing de Contenidos',\n    'Crear artículos de blog, videos educativos y optimización web para atraer tráfico continuo con bajo costo de pauta.'\n).\n\ndescripcion_estrategia(\n    email_marketing_y_fidelizacion,\n    'Email Marketing y Automatización de Retención',\n    'Diseñar flujos automáticos de nutrición, ofertas personalizadas y campañas de fidelización para clientes existentes.'\n).\n\ndescripcion_estrategia(\n    marketing_de_influencers_microinfluencers,\n    'Marketing con Micro-Influencers de Nicho',\n    'Colaborar con creadores de contenido especializados para construir confianza rápida y prueba social de tu producto.'\n).\n\ndescripcion_estrategia(\n    inbound_marketing_y_lead_nurturing,\n    'Inbound Marketing y Nutrición de Prospectos (Leads)',\n    'Ofrecer recursos descargables (lead magnets) y embudos automatizados de valor para productos o servicios complejos.'\n).\n\n% -----------------------------------------------------------------------------\n% pregunta(IdCriterio, TextoPregunta)\n% -----------------------------------------------------------------------------\npregunta(objetivo_ventas_directas,\n    '¿El objetivo principal del negocio es conseguir ventas o conversiones directas inmediatas?').\n\npregunta(objetivo_visibilidad_y_alcance,\n    '¿El objetivo principal es aumentar el alcance y reconocimiento de marca en el mercado?').\n\npregunta(objetivo_posicionamiento_largo_plazo,\n    '¿El objetivo es construir una presencia sólida y sostenible a mediano o largo plazo?').\n\npregunta(objetivo_retencion_y_recompra,\n    '¿El objetivo principal es fidelizar y maximizar el valor de los clientes actuales?').\n\npregunta(presupuesto_medio_o_alto,\n    '¿Cuentas con un presupuesto de inversión publicitaria medio o alto?').\n\npregunta(presupuesto_bajo_o_limitado,\n    '¿Cuentas con un presupuesto publicitario bajo o limitado?').\n\npregunta(publico_con_alta_intencion_compra,\n    '¿Tu público objetivo busca activamente una solución inmediata a una necesidad clara?').\n\npregunta(producto_visualmente_atractivo,\n    '¿Tu producto o servicio destaca de manera visual (fotografía, video, demostración)?').\n\npregunta(audiencia_joven_o_general,\n    '¿Tu audiencia objetivo suele consumir redes sociales de forma cotidiana?').\n\npregunta(capacidad_creacion_contenido,\n    '¿El equipo tiene tiempo o capacidad para redactar o producir contenido de valor?').\n\npregunta(posee_base_datos_clientes,\n    '¿Cuentas actualmente con correos electrónicos o contactos registrados de clientes o prospectos?').\n\npregunta(producto_recompra_recurrente,\n    '¿Tu modelo de negocio o producto permite compras repetidas o suscripciones recurrentes?').\n\npregunta(ciclo_de_venta_largo,\n    '¿El proceso de decisión de compra del cliente requiere evaluación previa o es de alto valor (B2B/servicios)?').\n";
+
+    // =========================================================================
+    // ESTADO DEL CLIENTE Y MOTOR PROLOG
+    // =========================================================================
+    let session = null;
+    let condicionesConocidas = {}; // memoria en JS sincronizada: criterio -> 'si' | 'no'
+    let hipotesisActual = null;
+    let criterioActual = null;
+    let evaluacionFinalizada = false;
+
+    // Lista de estrategias para iterar
+    const ESTRATEGIAS = [
+      { id: 'campanas_google_search_y_sem', nombre: 'Google Ads (Búsqueda / SEM)' },
+      { id: 'publicidad_redes_sociales_meta_ads', nombre: 'Social Ads (Meta / Instagram & Facebook)' },
+      { id: 'marketing_de_contenidos_y_seo', nombre: 'SEO Orgánico y Marketing de Contenidos' },
+      { id: 'email_marketing_y_fidelizacion', nombre: 'Email Marketing y Fidelización' },
+      { id: 'marketing_de_influencers_microinfluencers', nombre: 'Marketing con Micro-Influencers' },
+      { id: 'inbound_marketing_y_lead_nurturing', nombre: 'Inbound Marketing y Leads' }
+    ];
+
+    const DICCIONARIO_PREGUNTAS = {
+      'objetivo_ventas_directas': '¿El objetivo principal del negocio es conseguir ventas o conversiones directas inmediatas?',
+      'objetivo_visibilidad_y_alcance': '¿El objetivo principal es aumentar el alcance y reconocimiento de marca en el mercado?',
+      'objetivo_posicionamiento_largo_plazo': '¿El objetivo es construir una presencia sólida y sostenible a mediano o largo plazo?',
+      'objetivo_retencion_y_recompra': '¿El objetivo principal es fidelizar y maximizar el valor de los clientes actuales?',
+      'presupuesto_medio_o_alto': '¿Cuentas con un presupuesto de inversión publicitaria medio o alto?',
+      'presupuesto_bajo_o_limitado': '¿Cuentas con un presupuesto publicitario bajo o limitado?',
+      'publico_con_alta_intencion_compra': '¿Tu público objetivo busca activamente una solución inmediata a una necesidad clara?',
+      'producto_visualmente_atractivo': '¿Tu producto o servicio destaca de manera visual (fotografía, video, demostración)?',
+      'audiencia_joven_o_general': '¿Tu audiencia objetivo suele consumir redes sociales de forma cotidiana?',
+      'capacidad_creacion_contenido': '¿El equipo tiene tiempo o capacidad para redactar o producir contenido de valor?',
+      'posee_base_datos_clientes': '¿Cuentas actualmente con correos electrónicos o contactos registrados de clientes o prospectos?',
+      'producto_recompra_recurrente': '¿Tu modelo de negocio o producto permite compras repetidas o suscripciones recurrentes?',
+      'ciclo_de_venta_largo': '¿El proceso de decisión de compra del cliente requiere evaluación previa o es de alto valor (B2B/servicios)?'
+    };
+
+    const REGLAS_ESTRATEGIAS = {
+      'campanas_google_search_y_sem': ['objetivo_ventas_directas', 'presupuesto_medio_o_alto', 'publico_con_alta_intencion_compra'],
+      'publicidad_redes_sociales_meta_ads': ['objetivo_visibilidad_y_alcance', 'producto_visualmente_atractivo', 'audiencia_joven_o_general'],
+      'marketing_de_contenidos_y_seo': ['objetivo_posicionamiento_largo_plazo', 'presupuesto_bajo_o_limitado', 'capacidad_creacion_contenido'],
+      'email_marketing_y_fidelizacion': ['objetivo_retencion_y_recompra', 'posee_base_datos_clientes', 'producto_recompra_recurrente'],
+      'marketing_de_influencers_microinfluencers': ['objetivo_visibilidad_y_alcance', 'producto_visualmente_atractivo', 'presupuesto_medio_o_alto'],
+      'inbound_marketing_y_lead_nurturing': ['objetivo_ventas_directas', 'ciclo_de_venta_largo', 'capacidad_creacion_contenido']
+    };
+
+    const DESCRIPCIONES = {
+      'campanas_google_search_y_sem': {
+        nombre: 'Google Ads (Búsqueda / SEM)',
+        accion: 'Capturar clientes que ya están buscando activamente tus productos mediante anuncios en motores de búsqueda.'
+      },
+      'publicidad_redes_sociales_meta_ads': {
+        nombre: 'Social Ads (Meta / Instagram & Facebook)',
+        accion: 'Generar demanda y reconocimiento de marca a través de campañas segmentadas de imágenes y videos.'
+      },
+      'marketing_de_contenidos_y_seo': {
+        nombre: 'SEO Orgánico y Marketing de Contenidos',
+        accion: 'Crear artículos de blog y recursos educativos para posicionar en motores de búsqueda a largo plazo con bajo costo de pauta.'
+      },
+      'email_marketing_y_fidelizacion': {
+        nombre: 'Email Marketing y Fidelización',
+        accion: 'Diseñar flujos automáticos de nutrición y promociones personalizadas para clientes registrados.'
+      },
+      'marketing_de_influencers_microinfluencers': {
+        nombre: 'Marketing con Micro-Influencers de Nicho',
+        accion: 'Colaborar con creadores especializados para construir confianza rápida y prueba social.'
+      },
+      'inbound_marketing_y_lead_nurturing': {
+        nombre: 'Inbound Marketing y Nutrición de Leads',
+        accion: 'Crear embudos automatizados de captación y valor para productos o servicios complejos.'
+      }
+    };
+
+    // =========================================================================
+    // INICIALIZACIÓN
+    // =========================================================================
+    function iniciarSesion() {
+      condicionesConocidas = {};
+      hipotesisActual = null;
+      criterioActual = null;
+      evaluacionFinalizada = false;
+
+      const chatArea = document.getElementById("chatArea");
+      chatArea.innerHTML = "";
+      document.getElementById("quickActions").style.display = "flex";
+
+      // Inicializar Tau-Prolog
+      session = pl.create();
+      session.consult(CODIGO_PROLOG, {
+        success: function() {
+          agregarMensajeBot(`👋 ¡Hola! Soy tu <b>Asistente Experto en Marketing Digital</b>.<br><br>
+            Determinaré la mejor estrategia para tu empresa evaluando las hipótesis en tiempo real con <b>Tau-Prolog</b>.<br>
+            <ul>
+              <li>Puedes responder <b>Sí</b> o <b>No</b>.</li>
+              <li>O pulsar <b>¿Por qué?</b> (o escribir "porque") para auditar la hipótesis activa.</li>
+            </ul>`);
+          siguientePasoInferencia();
+        },
+        error: function(err) {
+          agregarMensajeBot(`❌ Error cargando Tau-Prolog: ${err}`);
+        }
+      });
+    }
+
+    // =========================================================================
+    // MOTOR DE INFERENCIA PASO A PASO (FRONTEND PROLOG)
+    // =========================================================================
+    function siguientePasoInferencia() {
+      if (evaluacionFinalizada) return;
+
+      // Buscar siguiente condición no conocida en las reglas de las estrategias
+      for (const est of ESTRATEGIAS) {
+        const condiciones = REGLAS_ESTRATEGIAS[est.id];
+        for (const cond of condiciones) {
+          if (condicionesConocidas[cond] === undefined) {
+            hipotesisActual = est;
+            criterioActual = cond;
+            const textoPregunta = DICCIONARIO_PREGUNTAS[cond] || `¿Aplica el criterio ${cond}?`;
+            agregarMensajeBot(textoPregunta);
+            return;
+          }
+        }
+      }
+
+      // Si todas las condiciones relevantes fueron evaluadas, calcular scoring final
+      finalizarEvaluacion();
+    }
+
+    function responderCriterio(respuesta) {
+      if (evaluacionFinalizada || !criterioActual) return;
+
+      condicionesConocidas[criterioActual] = respuesta;
+
+      // Registrar aserto en Tau-Prolog
+      session.query(`assertz(conocido(${criterioActual}, ${respuesta})).`, {
+        success: function() {
+          session.answer({
+            success: function() {
+              criterioActual = null;
+              siguientePasoInferencia();
+            }
+          });
+        }
+      });
+    }
+
+    // =========================================================================
+    // MECANISMO "WHY"
+    // =========================================================================
+    function mostrarExplicacionWhy() {
+      if (!hipotesisActual || !criterioActual) return;
+      const htmlWhy = `
+        <div style="font-weight: 600; margin-bottom: 4px;">🔍 Justificación "Why":</div>
+        Estoy evaluando la viabilidad de la estrategia: <b>"${hipotesisActual.nombre}"</b>.<br>
+        Para contrastar esta hipótesis, requiero verificar el criterio:<br>
+        <span class="tag-prolog">[${criterioActual}]</span>: <i>"${DICCIONARIO_PREGUNTAS[criterioActual]}"</i>.
+      `;
+      agregarMensajeWhy(htmlWhy);
+    }
+
+    // =========================================================================
+    // SCORING Y AUDITORÍA "HOW"
+    // =========================================================================
+    function finalizarEvaluacion() {
+      evaluacionFinalizada = true;
+      document.getElementById("quickActions").style.display = "none";
+
+      const ranking = [];
+
+      for (const est of ESTRATEGIAS) {
+        const condiciones = REGLAS_ESTRATEGIAS[est.id];
+        const cumplidas = [];
+        const noCumplidas = [];
+
+        condiciones.forEach(c => {
+          if (condicionesConocidas[c] === 'si') {
+            cumplidas.push(c);
+          } else {
+            noCumplidas.push(c);
+          }
+        });
+
+        const score = Math.round((cumplidas.length / condiciones.length) * 100);
+        ranking.push({
+          id: est.id,
+          nombre: DESCRIPCIONES[est.id].nombre,
+          accion: DESCRIPCIONES[est.id].accion,
+          score: score,
+          cumplidas: cumplidas,
+          noCumplidas: noCumplidas
+        });
+      }
+
+      // Ordenar por score descendente
+      ranking.sort((a, b) => b.score - a.score);
+
+      const ganadora = ranking[0];
+      const alternativas = ranking.slice(1).filter(r => r.score >= 50);
+
+      renderizarResultadoFinal(ganadora, alternativas, ranking);
+    }
+
+    function renderizarResultadoFinal(ganadora, alternativas, rankingCompleto) {
+      if (!ganadora || ganadora.score === 0) {
+        agregarMensajeBot(`
+          <div class="msg-result" style="border-color: #ef4444; background-color: #450a0a;">
+            <h2>❌ Sin recomendación viable</h2>
+            <p>Todas las respuestas registradas resultaron negativas (0% de coincidencia). Te recomendamos replantear tus objetivos de marketing.</p>
+          </div>
+        `);
+        return;
+      }
+
+      let alternativasHtml = "";
+      if (alternativas.length > 0) {
+        alternativasHtml = `
+          <div style="margin-top: 14px; font-size: 0.9rem;">
+            <b>Otras opciones viables:</b>
+            <ul style="margin-left: 18px; margin-top: 4px;">
+              ${alternativas.map(a => `<li>${a.nombre} <b>(${a.score}% afinidad)</b></li>`).join('')}
+            </ul>
+          </div>
+        `;
+      }
+
+      // Trazabilidad HOW
+      let howHtml = "";
+      rankingCompleto.filter(r => r.score > 0).forEach(r => {
+        howHtml += `
+          <div style="margin-top: 10px; padding: 8px 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+            <b>${r.nombre} (${r.score}% de coincidencia):</b>
+            <ul class="how-list">
+              ${r.cumplidas.map(c => `<li><span class="check">✓</span> ${DICCIONARIO_PREGUNTAS[c]}</li>`).join('')}
+              ${r.noCumplidas.map(c => `<li><span class="cross">✗</span> ${DICCIONARIO_PREGUNTAS[c]}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      });
+
+      const resultadoHtml = `
+        <div class="msg-result">
+          <span class="score-pill">🏆 Recomendación Principal: ${ganadora.score}% Afinidad</span>
+          <h2>${ganadora.nombre}</h2>
+          <p style="color: #cbd5e1; margin-top: 4px;">${ganadora.accion}</p>
+
+          ${alternativasHtml}
+
+          <div class="how-section">
+            <h4 style="color: #93c5fd; margin-bottom: 6px;">📜 Trazabilidad y Justificación Deductiva ("How"):</h4>
+            ${howHtml}
+          </div>
+        </div>
+      `;
+
+      agregarMensajeBot(resultadoHtml);
+    }
+
+    // =========================================================================
+    // GESTIÓN DE UI / MENSAJES
+    // =========================================================================
+    function agregarMensajeBot(html) {
+      const chatArea = document.getElementById("chatArea");
+      const msg = document.createElement("div");
+      msg.className = "msg msg-bot";
+      msg.innerHTML = html;
+      chatArea.appendChild(msg);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function agregarMensajeUser(texto) {
+      const chatArea = document.getElementById("chatArea");
+      const msg = document.createElement("div");
+      msg.className = "msg msg-user";
+      msg.textContent = texto;
+      chatArea.appendChild(msg);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function agregarMensajeWhy(html) {
+      const chatArea = document.getElementById("chatArea");
+      const msg = document.createElement("div");
+      msg.className = "msg msg-why";
+      msg.innerHTML = html;
+      chatArea.appendChild(msg);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function enviarRespuesta(valor) {
+      if (valor === 'porque') {
+        agregarMensajeUser("¿Por qué me preguntas esto?");
+        mostrarExplicacionWhy();
+      } else {
+        agregarMensajeUser(valor === 'si' ? "Sí" : "No");
+        responderCriterio(valor);
+      }
+    }
+
+    function enviarTextoLibre() {
+      const input = document.getElementById("userInput");
+      const valor = input.value.trim().toLowerCase();
+      input.value = "";
+      if (!valor) return;
+
+      if (['si', 's', 'yes', 'y', 'sí'].includes(valor)) {
+        enviarRespuesta('si');
+      } else if (['no', 'n'].includes(valor)) {
+        enviarRespuesta('no');
+      } else if (['porque', 'por que', 'por qué', 'porqué', 'why', 'w', '?'].includes(valor)) {
+        enviarRespuesta('porque');
+      } else {
+        agregarMensajeBot('⚠️ Entrada no reconocida. Escribe <b>"si"</b>, <b>"no"</b> o <b>"porque"</b>.');
+      }
+    }
+
+    // Iniciar al cargar
+    window.addEventListener("DOMContentLoaded", iniciarSesion);
+  </script>
+</body>
+</html>
