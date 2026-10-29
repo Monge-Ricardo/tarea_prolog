@@ -4,7 +4,7 @@
 % PUNTO DE ENTRADA PRINCIPAL (MAIN)
 % =============================================================================
 % Orquesta la interacción, evalúa las hipótesis con scoring y presenta
-% el diagnóstico y la trazabilidad "How" al usuario.
+% el diagnóstico y la trazabilidad "How" al usuario exclusivamente en consola.
 % =============================================================================
 
 :- consult('conocimiento_marketing.pl').
@@ -33,20 +33,19 @@ imprimir_banner :-
     nl.
 
 % -----------------------------------------------------------------------------
-% Presentación de resultados y trazabilidad "How"
+% Presentación de resultados: ÚNICA opción recomendada y auditoría "How"
 % -----------------------------------------------------------------------------
 presentar_resultados([]) :-
     nl,
     writeln('No se evaluaron estrategias en la base de conocimiento.'),
     nl.
 
-presentar_resultados([Mejor | Otras]) :-
+presentar_resultados([Mejor | _]) :-
     Mejor = resultado(Score, _, _, _),
     Score > 0,
     !,
     imprimir_estrategia_ganadora(Mejor),
-    imprimir_alternativas(Otras),
-    imprimir_seccion_auditoria([Mejor | Otras]).
+    imprimir_seccion_auditoria([Mejor]).
 
 presentar_resultados(_) :-
     nl,
@@ -64,40 +63,19 @@ imprimir_estrategia_ganadora(resultado(Score, Estrategia, _, _)) :-
     writeln('                   ESTRATEGIA RECOMENDADA                        '),
     writeln('================================================================='),
     (   descripcion_estrategia(Estrategia, Nombre, Accion)
-    ->  format('Estrategia:  ~w~n', [Nombre]),
-        format('Afinidad:    ~w% de coincidencia~n~n', [Score]),
+    ->  format('Estrategia sugerida: ~w~n', [Nombre]),
+        format('Afinidad:            ~w% de coincidencia~n~n', [Score]),
         format('Plan de Acción Recomendado:~n  ~w~n', [Accion])
     ;   format('Estrategia: ~w (~w% de afinidad)~n', [Estrategia, Score])
     ),
     writeln('================================================================='),
     nl.
 
-imprimir_alternativas(Otras) :-
-    include(es_alternativa_viable, Otras, Viables),
-    (   Viables \== []
-    ->  writeln('-------------------- OTRAS OPCIONES VIABLES --------------------'),
-        listar_otras_opciones(Viables),
-        writeln('----------------------------------------------------------------'),
-        nl
-    ;   true
-    ).
-
-es_alternativa_viable(resultado(Score, _, _, _)) :-
-    Score >= 50.
-
-listar_otras_opciones([]).
-listar_otras_opciones([resultado(Score, Estrategia, _, _) | Resto]) :-
-    (   descripcion_estrategia(Estrategia, Nombre, _)
-    ->  format('  * ~w (~w% de coincidencia)~n', [Nombre, Score])
-    ;   format('  * ~w (~w% de coincidencia)~n', [Estrategia, Score])
-    ),
-    listar_otras_opciones(Resto).
-
 imprimir_seccion_auditoria(ListaResultados) :-
     writeln('================================================================='),
     writeln('             AUDITORÍA Y TRAZABILIDAD DEDUCTIVA ("HOW")          '),
     writeln('================================================================='),
-    writeln('A continuación se detalla la justificación deductiva de cada     '),
+    writeln('A continuación se detalla la justificación deductiva de la       '),
     writeln('estrategia calculada a partir de la memoria de trabajo:          '),
     nl,
     include(tiene_score_positivo, ListaResultados, Relevantes),
@@ -109,5 +87,3 @@ imprimir_seccion_auditoria(ListaResultados) :-
     nl.
 
 tiene_score_positivo(resultado(Score, _, _, _)) :- Score > 0.
-
-:- initialization(main, main).

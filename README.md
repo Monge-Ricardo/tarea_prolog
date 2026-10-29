@@ -1,50 +1,57 @@
 # Sistema Experto de Estrategias de Marketing Digital (Prolog)
 
-Este proyecto implementa un sistema interactivo de inferencia lógica basado en el modelo **Atributo-Valor** para la recomendación de estrategias de marketing digital, con soporte para consola (SWI-Prolog) y frontend web interactivo (Tau-Prolog).
+Este proyecto implementa un sistema experto interactivo por consola en **Prolog** (SWI-Prolog) basado en el modelo **Atributo-Valor**, con scoring de incertidumbre y mecanismos de auditoría ("Why" y "How").
 
 ---
 
 ## 📁 Estructura del Proyecto
 
-1. **[preguntas_marketing.json](file:///c:/Users/quiro/Documents/ESPE/SextoSemestre/ApplicacionesBasadasConocimiento/tarea_prolog/preguntas_marketing.json)**:
-   - Definición estructurada de preguntas en 3ª persona, responsabilidades atómicas y opciones categóricas.
-2. **[conocimiento_marketing.pl](file:///c:/Users/quiro/Documents/ESPE/SextoSemestre/ApplicacionesBasadasConocimiento/tarea_prolog/conocimiento_marketing.pl)**: 
-   - Base de conocimiento declarativa con reglas `condicion(Atributo, ValoresPermitidos)`, descripciones y definiciones de preguntas (`definicion_pregunta/5`).
-3. **[motor_experto.pl](file:///c:/Users/quiro/Documents/ESPE/SextoSemestre/ApplicacionesBasadasConocimiento/tarea_prolog/motor_experto.pl)**:
-   - Motor genérico con scoring porcentual de incertidumbre, memoria de trabajo dinámica (`conocido(Atributo, Valor)`), selección múltiple y mecanismos de auditoría ("Why" / "How").
-4. **[main.pl](file:///c:/Users/quiro/Documents/ESPE/SextoSemestre/ApplicacionesBasadasConocimiento/tarea_prolog/main.pl)**:
-   - Orquestador y punto de entrada para ejecución por terminal/consola.
-5. **[index.html](file:///c:/Users/quiro/Documents/ESPE/SextoSemestre/ApplicacionesBasadasConocimiento/tarea_prolog/index.html)**:
-   - Frontend web conversacional (interfaz de chat) que ejecuta el motor de Prolog en el navegador mediante **Tau-Prolog** con botones de opción dinámicos.
-6. **`js/`**:
-   - Librerías locales de Tau-Prolog (`tau-prolog.js` y `lists.js`).
+1. **[conocimiento_marketing.pl](file:///c:/Users/andre/Documents/ESPE/ESPE/SEMESTRE6/ABC/workspace/tarea_prolog/conocimiento_marketing.pl)**: 
+   - Base de conocimiento puramente declarativa.
+   - Reglas de negocio con estructura: `condicion(IdAtributo, ListaValoresAceptables)`.
+   - Definiciones formales de preguntas y opciones atómicas (`definicion_pregunta/5`).
+   - Guías de acción y descripciones de estrategias (`descripcion_estrategia/3`).
+
+2. **[motor_experto.pl](file:///c:/Users/andre/Documents/ESPE/ESPE/SEMESTRE6/ABC/workspace/tarea_prolog/motor_experto.pl)**:
+   - Motor interactivo de inferencia y scoring de coincidencia porcentual.
+   - Memoria de trabajo dinámica no redundante (`conocido(Atributo, Valor)`).
+   - Manejo de entradas numéricas, cadenas y sinónimos.
+   - Subsistema de explicación:
+     - **Why:** Justificación contextual al ingresar `porque` o `?`.
+     - **How:** Trazabilidad deductiva de evidencias cumplidas y no cumplidas.
+
+3. **[main.pl](file:///c:/Users/andre/Documents/ESPE/ESPE/SEMESTRE6/ABC/workspace/tarea_prolog/main.pl)**:
+   - Orquestador del flujo y punto de entrada por consola.
+   - Presenta **únicamente la recomendación principal** ganadora y su respectiva justificación.
 
 ---
 
-## 🌐 Uso del Frontend Web (Chat Conversacional)
+## 💻 Cómo Ejecutar el Sistema en Consola (SWI-Prolog)
 
-Para iniciar el servidor local en cualquier momento:
+Abre una terminal de PowerShell o CMD en la carpeta del proyecto:
 ```powershell
-python -m http.server 8000
+cd "c:\Users\andre\Documents\ESPE\ESPE\SEMESTRE6\ABC\workspace\tarea_prolog"
 ```
-Y abre tu navegador en:
-👉 **[http://localhost:8000/index.html](http://localhost:8000/index.html)**
 
-### Características del Chat:
-- **Botones dinámicos:** Muestra botones para cada opción disponible (ej. *Alto*, *Medio*, *Bajo* o *Sí*, *No*) y botón de auditoría *¿Por qué?*.
-- **Motor Prolog local:** Inferencia directa mediante Tau-Prolog sin depender de servidores externos.
-- **Justificación "Why":** Audita en tiempo real qué hipótesis se evalúa y qué valores son requeridos.
-- **Reporte "How":** Desglose detallado de afinidad porcentual, coincidencias (`✓`) e incompatibilidades (`✗`).
-
----
-
-## 💻 Ejecución por Terminal (SWI-Prolog)
-
+### Opción 1: Ejecución Directa
 ```powershell
-swipl -s main.pl -g main -t halt
+swipl -s main.pl
 ```
-O dentro de SWI-Prolog interactivo:
+
+### Opción 2: Modo Interactivo
+```powershell
+swipl
+```
+Y dentro del entorno Prolog:
 ```prolog
 ?- [main].
-?- main.
+?- iniciar.
 ```
+
+---
+
+## 📝 Modo de Uso en Consola
+
+* **Preguntas de selección única (menú numérico):** Escribe el número correspondiente a tu opción (ej. `1`, `2` o `3`) y presiona Enter.
+* **Preguntas de Sí/No:** Escribe `si` o `no`.
+* **Auditoría "Why":** En cualquier pregunta puedes escribir `porque` o `?` antes de responder para que el sistema te indique qué estrategia está evaluando y qué valor necesita.
