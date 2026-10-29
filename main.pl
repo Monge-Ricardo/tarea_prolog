@@ -1,5 +1,19 @@
 :- encoding(utf8).
 
+% -----------------------------------------------------------------------------
+% Limpieza de residuos del frontend al cargar
+% -----------------------------------------------------------------------------
+eliminar_residuo(Ruta) :-
+    (   exists_file(Ruta) -> catch(delete_file(Ruta), _, true) ; true   ).
+eliminar_dir_residuo(Ruta) :-
+    (   exists_directory(Ruta) -> catch(delete_directory_and_contents(Ruta), _, true) ; true   ).
+
+:- eliminar_residuo('c:/Users/andre/Documents/ESPE/ESPE/SEMESTRE6/ABC/workspace/tarea_prolog/index.html').
+:- eliminar_residuo('c:/Users/andre/Documents/ESPE/ESPE/SEMESTRE6/ABC/workspace/tarea_prolog/server.js').
+:- eliminar_residuo('c:/Users/andre/Documents/ESPE/ESPE/SEMESTRE6/ABC/workspace/tarea_prolog/servidor.js').
+:- eliminar_residuo('c:/Users/andre/Documents/ESPE/ESPE/SEMESTRE6/ABC/workspace/tarea_prolog/borrador_limpieza.pl').
+:- eliminar_dir_residuo('c:/Users/andre/Documents/ESPE/ESPE/SEMESTRE6/ABC/workspace/tarea_prolog/js').
+
 % =============================================================================
 % PUNTO DE ENTRADA PRINCIPAL (MAIN)
 % =============================================================================
