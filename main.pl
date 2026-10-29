@@ -25,9 +25,10 @@ imprimir_banner :-
     writeln('             (Con Scoring de Afinidad y Auditoría)               '),
     writeln('================================================================='),
     writeln('Instrucciones:'),
-    writeln('  * Responde "si" o "no" a las preguntas formuladas.'),
+    writeln('  * Para preguntas de opciones múltiples, ingresa el número de la opción.'),
+    writeln('  * Para preguntas booleanas, responde "si" o "no".'),
     writeln('  * Puedes escribir "porque" o "?" en cualquier momento para saber'),
-    writeln('    qué hipótesis está evaluando el motor y por qué te pregunta eso.'),
+    writeln('    qué hipótesis está evaluando el motor y por qué solicita ese dato.'),
     writeln('-----------------------------------------------------------------'),
     nl.
 
@@ -52,8 +53,8 @@ presentar_resultados(_) :-
     writeln('================================================================='),
     writeln('                      RESULTADO                                  '),
     writeln('================================================================='),
-    writeln('Todas las respuestas registradas fueron negativas (0% afinidad). '),
-    writeln('No fue posible identificar ninguna estrategia compatible.        '),
+    writeln('Todas las respuestas registradas fueron incompatibles (0% afinidad).'),
+    writeln('No fue posible identificar ninguna estrategia recomendada.       '),
     writeln('================================================================='),
     nl.
 

@@ -1,13 +1,14 @@
 :- encoding(utf8).
 
 % =============================================================================
-% MOTOR EXPERTO GENÉRICO INTERACTIVO CON SCORING Y EXPLICACIÓN (WHY / HOW)
+% MOTOR EXPERTO GENÉRICO INTERACTIVO CON ATRIBUTO-VALOR, SCORING Y EXPLICACIÓN
 % =============================================================================
 % Características principales:
-% 1. Razonamiento con incertidumbre mediante scoring porcentual de afinidad.
-% 2. Justificación "Why": Explica por qué se realiza una pregunta al escribir 'porque'.
-% 3. Trazabilidad "How": Registra evidencias afirmativas y negativas para auditar deducciones.
-% 4. Memoria de trabajo dinámica (conocido/2) para evitar preguntas repetidas.
+% 1. Razonamiento estructurado mediante modelo Atributo-Valor (categorías y booleanas).
+% 2. Scoring de incertidumbre y afinidad porcentual por estrategia.
+% 3. Justificación interactiva "Why": Explica por qué se solicita un atributo.
+% 4. Trazabilidad "How": Desglosa los valores registrados vs valores aceptados.
+% 5. Memoria de trabajo dinámica (conocido/2) para evitar preguntas repetidas.
 % =============================================================================
 
 :- dynamic conocido/2.
@@ -45,62 +46,148 @@ evaluar_estrategia(Estrategia, Score, Cumplidas, NoCumplidas) :-
 % -----------------------------------------------------------------------------
 evaluar_lista_condiciones([], _, [], []).
 evaluar_lista_condiciones([Condicion | Resto], Hipotesis, [Condicion | CumplidasResto], NoCumplidasResto) :-
-    verificar_condicion(Condicion, Hipotesis, si),
+    verificar_condicion(Condicion, Hipotesis),
     !,
     evaluar_lista_condiciones(Resto, Hipotesis, CumplidasResto, NoCumplidasResto).
 evaluar_lista_condiciones([Condicion | Resto], Hipotesis, CumplidasResto, [Condicion | NoCumplidasResto]) :-
     evaluar_lista_condiciones(Resto, Hipotesis, CumplidasResto, NoCumplidasResto).
 
 % -----------------------------------------------------------------------------
-% verificar_condicion(+Condicion, +HipotesisActual, -EstadoRespuesta)
-% Consulta la memoria dinámica o interroga al usuario con soporte "Why".
+% verificar_condicion(+Condicion, +HipotesisActual)
+% Evalúa si la condición condicion(Atributo, ValoresPermitidos) se satisface.
+% Si el atributo no se conoce en memoria, se le pregunta al usuario.
 % -----------------------------------------------------------------------------
-verificar_condicion(Condicion, _, si) :-
-    conocido(Condicion, si),
-    !.
-verificar_condicion(Condicion, _, no) :-
-    conocido(Condicion, no),
+verificar_condicion(condicion(Atributo, ValoresPermitidos), _) :-
+    conocido(Atributo, ValorActual),
     !,
-    fail.
-verificar_condicion(Condicion, Hipotesis, RespuestaFinal) :-
-    obtener_texto_pregunta(Condicion, TextoPregunta),
-    solicitar_respuesta(TextoPregunta, Hipotesis, Condicion, RespuestaFinal),
-    assertz(conocido(Condicion, RespuestaFinal)),
-    RespuestaFinal == si.
+    member(ValorActual, ValoresPermitidos).
+
+verificar_condicion(condicion(Atributo, ValoresPermitidos), Hipotesis) :-
+    definicion_pregunta(Atributo, Tipo, TextoPregunta, Ayuda, Opciones),
+    solicitar_respuesta(Atributo, Tipo, TextoPregunta, Ayuda, Opciones, Hipotesis, condicion(Atributo, ValoresPermitidos), ValorElegido),
+    assertz(conocido(Atributo, ValorElegido)),
+    member(ValorElegido, ValoresPermitidos).
 
 % -----------------------------------------------------------------------------
-% solicitar_respuesta(+TextoPregunta, +Hipotesis, +Condicion, -Respuesta)
-% Lee la respuesta. Si el usuario ingresa 'porque' o 'why', explica la razón
-% de la pregunta e insiste por la respuesta 'si' o 'no'.
+% solicitar_respuesta(+Atributo, +Tipo, +Texto, +Ayuda, +Opciones, +Hipotesis, +Condicion, -ValorElegido)
+% Formatea la pregunta y opciones según sea booleana o selección única.
 % -----------------------------------------------------------------------------
-solicitar_respuesta(TextoPregunta, Hipotesis, Condicion, Respuesta) :-
+solicitar_respuesta(Atributo, booleana, TextoPregunta, _, Opciones, Hipotesis, Condicion, ValorElegido) :-
     format('~w [si/no/porque]: ', [TextoPregunta]),
     flush_output,
     read_line_to_string(user_input, RawInput),
-    normalizar_entrada(RawInput, Entrada),
-    procesar_entrada(Entrada, TextoPregunta, Hipotesis, Condicion, Respuesta).
+    procesar_lectura_booleana(RawInput, Atributo, TextoPregunta, Opciones, Hipotesis, Condicion, ValorElegido).
 
-procesar_entrada(si, _, _, _, si) :- !.
-procesar_entrada(no, _, _, _, no) :- !.
-procesar_entrada(porque, TextoPregunta, Hipotesis, Condicion, Respuesta) :-
-    !,
-    explicar_why(Hipotesis, Condicion),
-    solicitar_respuesta(TextoPregunta, Hipotesis, Condicion, Respuesta).
-procesar_entrada(_, TextoPregunta, Hipotesis, Condicion, Respuesta) :-
-    writeln('>> Opción no reconocida. Ingresa "si", "no" o "porque" (seguido de Enter).'),
-    solicitar_respuesta(TextoPregunta, Hipotesis, Condicion, Respuesta).
+solicitar_respuesta(Atributo, seleccion_unica, TextoPregunta, _, Opciones, Hipotesis, Condicion, ValorElegido) :-
+    nl,
+    writeln(TextoPregunta),
+    mostrar_opciones_numeradas(Opciones, 1),
+    length(Opciones, TotalOpciones),
+    format('Selecciona una opción [1-~w o "porque"]: ', [TotalOpciones]),
+    flush_output,
+    read_line_to_string(user_input, RawInput),
+    procesar_lectura_seleccion(RawInput, Atributo, TextoPregunta, Opciones, Hipotesis, Condicion, ValorElegido).
+
+mostrar_opciones_numeradas([], _) :- !.
+mostrar_opciones_numeradas([opcion(_, Texto, _) | Resto], Indice) :-
+    format('  [~w] ~w~n', [Indice, Texto]),
+    Siguiente is Indice + 1,
+    mostrar_opciones_numeradas(Resto, Siguiente).
+
+% -----------------------------------------------------------------------------
+% Procesamiento de entrada booleana
+% -----------------------------------------------------------------------------
+procesar_lectura_booleana(end_of_file, _, _, _, _, _, no) :- !.
+procesar_lectura_booleana(Raw, Atributo, Texto, Opciones, Hipotesis, Condicion, Valor) :-
+    limpiar_texto_entrada(Raw, Limpio),
+    (   Limpio == ''
+    ->  solicitar_respuesta(Atributo, booleana, Texto, '', Opciones, Hipotesis, Condicion, Valor)
+    ;   es_consulta_why(Limpio)
+    ->  explicar_why(Hipotesis, Condicion),
+        solicitar_respuesta(Atributo, booleana, Texto, '', Opciones, Hipotesis, Condicion, Valor)
+    ;   clasificar_en_opciones(Limpio, Opciones, Valor)
+    ->  true
+    ;   writeln('>> Opción no reconocida. Ingresa "si", "no" o "porque".'),
+        solicitar_respuesta(Atributo, booleana, Texto, '', Opciones, Hipotesis, Condicion, Valor)
+    ).
+
+% -----------------------------------------------------------------------------
+% Procesamiento de entrada de selección múltiple/única
+% -----------------------------------------------------------------------------
+procesar_lectura_seleccion(end_of_file, _, _, [opcion(PrimerId, _, _) | _], _, _, PrimerId) :- !.
+procesar_lectura_seleccion(Raw, Atributo, Texto, Opciones, Hipotesis, Condicion, Valor) :-
+    limpiar_texto_entrada(Raw, Limpio),
+    (   Limpio == ''
+    ->  solicitar_respuesta(Atributo, seleccion_unica, Texto, '', Opciones, Hipotesis, Condicion, Valor)
+    ;   es_consulta_why(Limpio)
+    ->  explicar_why(Hipotesis, Condicion),
+        solicitar_respuesta(Atributo, seleccion_unica, Texto, '', Opciones, Hipotesis, Condicion, Valor)
+    ;   buscar_por_indice_o_sinonimo(Limpio, Opciones, 1, Valor)
+    ->  true
+    ;   writeln('>> Opción no válida. Ingresa el número correspondiente o escribe "porque".'),
+        solicitar_respuesta(Atributo, seleccion_unica, Texto, '', Opciones, Hipotesis, Condicion, Valor)
+    ).
+
+buscar_por_indice_o_sinonimo(Input, [opcion(Id, _, _) | _], Indice, Id) :-
+    atom_number(Input, Num),
+    Num == Indice,
+    !.
+buscar_por_indice_o_sinonimo(Input, [opcion(Id, _, Sinonimos) | _], _, Id) :-
+    (   Input == Id
+    ;   member(Input, Sinonimos)
+    ),
+    !.
+buscar_por_indice_o_sinonimo(Input, [_ | Resto], Indice, IdEncontrado) :-
+    Siguiente is Indice + 1,
+    buscar_por_indice_o_sinonimo(Input, Resto, Siguiente, IdEncontrado).
+
+clasificar_en_opciones(Input, [opcion(Id, _, Sinonimos) | _], Id) :-
+    (   Input == Id
+    ;   member(Input, Sinonimos)
+    ),
+    !.
+clasificar_en_opciones(Input, [_ | Resto], IdEncontrado) :-
+    clasificar_en_opciones(Input, Resto, IdEncontrado).
+
+es_consulta_why(A) :-
+    member(A, ['porque', 'por que', 'porqué', 'por qué', 'why', 'w', '?', 'p', 'explicar']).
+
+limpiar_texto_entrada(Raw, Limpio) :-
+    normalize_space(atom(Atom), Raw),
+    downcase_atom(Atom, Lower),
+    remover_puntuacion(Lower, Limpio).
+
+remover_puntuacion(Atom, Limpio) :-
+    (   member(Atom, ['?', '¿?', '¿', 'why', 'porque'])
+    ->  Limpio = 'porque'
+    ;   atom_chars(Atom, Chars),
+        exclude(es_puntuacion, Chars, CharsLimpios),
+        atom_chars(Limpio, CharsLimpios)
+    ).
+
+es_puntuacion('.').
+es_puntuacion(',').
+es_puntuacion(';').
+es_puntuacion('!').
+es_puntuacion('¡').
 
 % -----------------------------------------------------------------------------
 % MECANISMO DE EXPLICACIÓN "WHY" (¿Por qué me preguntas esto?)
 % -----------------------------------------------------------------------------
-explicar_why(Hipotesis, Condicion) :-
+explicar_why(Hipotesis, condicion(Atributo, ValoresPermitidos)) :-
     nl,
     writeln('-------------------- [JUSTIFICACIÓN "WHY"] --------------------'),
     (   descripcion_estrategia(Hipotesis, NombreHipotesis, _)
     ->  format('Estoy evaluando la viabilidad de la estrategia:~n   "~w"~n', [NombreHipotesis])
     ;   format('Estoy evaluando la viabilidad de la hipótesis: "~w"~n', [Hipotesis])
     ),
-    format('Para poder determinar su idoneidad, necesito verificar si aplica el criterio:~n   "~w".~n', [Condicion]),
+    (   definicion_pregunta(Atributo, _, TextoPregunta, Ayuda, _)
+    ->  format('Se necesita determinar el parámetro: "~w"~n', [Atributo]),
+        format('Pregunta asociada: ~w~n', [TextoPregunta]),
+        format('Contexto: ~w~n', [Ayuda])
+    ;   format('Se necesita evaluar la condición sobre: "~w"~n', [Atributo])
+    ),
+    format('Para que esta estrategia sea viable, los valores requeridos son: ~w~n', [ValoresPermitidos]),
     writeln('---------------------------------------------------------------'),
     nl.
 
@@ -115,45 +202,20 @@ explicar_how(resultado(Score, Estrategia, Cumplidas, NoCumplidas)) :-
     writeln('  [+] Evidencias afirmativas confirmadas en memoria:'),
     imprimir_lista_how(Cumplidas, '     ✓ '),
     (   NoCumplidas \== []
-    ->  writeln('  [-] Evidencias no satisfechas o ausentes:'),
+    ->  writeln('  [-] Criterios no satisfechos o incompatibles:'),
         imprimir_lista_how(NoCumplidas, '     ✗ ')
     ;   writeln('  [!] Se cumplió el 100% de los criterios ideales.')
     ),
     nl.
 
 imprimir_lista_how([], _) :- !.
-imprimir_lista_how([C | Resto], Prefijo) :-
-    (   pregunta(C, Texto)
-    ->  format('~w~w (~w)~n', [Prefijo, Texto, C])
-    ;   format('~w~w~n', [Prefijo, C])
+imprimir_lista_how([condicion(Atributo, ValoresPermitidos) | Resto], Prefijo) :-
+    (   conocido(Atributo, ValorActual)
+    ->  descripcion_valor(Atributo, ValorActual, TextoValor),
+        format('~w~w: Registrado = "~w" (Requerido: ~w)~n', [Prefijo, Atributo, TextoValor, ValoresPermitidos])
+    ;   format('~w~w (No evaluado, Requerido: ~w)~n', [Prefijo, Atributo, ValoresPermitidos])
     ),
     imprimir_lista_how(Resto, Prefijo).
-
-% -----------------------------------------------------------------------------
-% Auxiliares de texto y memoria
-% -----------------------------------------------------------------------------
-obtener_texto_pregunta(Condicion, Texto) :-
-    pregunta(Condicion, Texto),
-    !.
-obtener_texto_pregunta(Condicion, Texto) :-
-    format(atom(Texto), '¿Aplica el criterio "~w"?', [Condicion]).
-
-normalizar_entrada(Input, si) :-
-    normalize_space(atom(Str), Input),
-    downcase_atom(Str, Lower),
-    member(Lower, ['si', 's', 'yes', 'y', 'sí']),
-    !.
-normalizar_entrada(Input, no) :-
-    normalize_space(atom(Str), Input),
-    downcase_atom(Str, Lower),
-    member(Lower, ['no', 'n']),
-    !.
-normalizar_entrada(Input, porque) :-
-    normalize_space(atom(Str), Input),
-    downcase_atom(Str, Lower),
-    member(Lower, ['porque', 'por que', 'porqué', 'por qué', 'why', 'w', '?']),
-    !.
-normalizar_entrada(_, invalido).
 
 reiniciar_memoria :-
     retractall(conocido(_, _)).

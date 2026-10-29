@@ -39,8 +39,8 @@
 
     .chat-container {
       width: 100%;
-      max-width: 860px;
-      height: 90vh;
+      max-width: 900px;
+      height: 92vh;
       background-color: #111827;
       border: 1px solid var(--border);
       border-radius: 16px;
@@ -100,16 +100,15 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      scroll-behavior: smooth;
+      gap: 14px;
     }
 
     .msg {
-      max-width: 85%;
-      padding: 14px 18px;
-      border-radius: 14px;
-      line-height: 1.5;
+      max-width: 82%;
+      padding: 12px 16px;
+      border-radius: 12px;
       font-size: 0.95rem;
+      line-height: 1.5;
       animation: fadeIn 0.25s ease-in-out;
     }
 
@@ -122,76 +121,73 @@
       align-self: flex-start;
       background-color: var(--bubble-bot);
       border: 1px solid var(--border);
-      border-bottom-left-radius: 4px;
+      color: var(--text);
     }
 
     .msg-user {
       align-self: flex-end;
       background-color: var(--bubble-user);
-      border-bottom-right-radius: 4px;
+      color: white;
     }
 
     .msg-why {
       align-self: flex-start;
-      background-color: #3b2a09;
+      background-color: var(--bubble-why);
       border: 1px solid #a16207;
       color: #fef08a;
-      border-radius: 12px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
 
     .msg-result {
-      align-self: center;
       width: 100%;
-      max-width: 760px;
-      background-color: #172554;
-      border: 1px solid #2563eb;
-      border-radius: 14px;
-      padding: 20px;
+      max-width: 100%;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 8px;
     }
 
     .msg-result h2 {
-      font-size: 1.25rem;
-      color: #38bdf8;
-      margin-bottom: 8px;
+      color: var(--primary);
+      margin-bottom: 6px;
+      font-size: 1.35rem;
     }
 
     .score-pill {
       display: inline-block;
-      padding: 4px 12px;
-      background-color: #0284c7;
-      color: white;
-      border-radius: 9999px;
-      font-weight: bold;
+      background-color: var(--badge-success);
+      color: #bbf7d0;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
       font-size: 0.85rem;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .how-section {
       margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px dashed #3b82f6;
-      font-size: 0.88rem;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      font-size: 0.85rem;
     }
 
     .how-list {
       list-style: none;
       margin-top: 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
     }
 
     .how-list li {
+      margin-bottom: 4px;
       display: flex;
       align-items: flex-start;
       gap: 6px;
     }
 
-    .how-list .check { color: #4ade80; }
-    .how-list .cross { color: #f87171; }
+    .check { color: #4ade80; font-weight: bold; }
+    .cross { color: #f87171; font-weight: bold; }
 
-    /* Controls & Input */
+    /* Controls Area */
     .chat-controls {
       padding: 14px 20px;
       background-color: #1f2937;
@@ -203,15 +199,17 @@
 
     .quick-actions {
       display: flex;
-      gap: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .btn-action {
-      flex: 1;
+      flex: 1 1 auto;
+      min-width: 110px;
       padding: 10px 14px;
       border: none;
       border-radius: 8px;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 500;
       cursor: pointer;
       transition: background-color 0.2s, transform 0.1s;
@@ -220,6 +218,13 @@
     .btn-action:active {
       transform: scale(0.98);
     }
+
+    .btn-opt {
+      background-color: #1e3a8a;
+      color: #e0e7ff;
+      border: 1px solid #3b82f6;
+    }
+    .btn-opt:hover { background-color: #2563eb; color: #fff; }
 
     .btn-yes {
       background-color: #15803d;
@@ -236,7 +241,7 @@
     .btn-why {
       background-color: #b45309;
       color: white;
-      max-width: 140px;
+      min-width: 110px;
     }
     .btn-why:hover { background-color: #d97706; }
 
@@ -289,7 +294,7 @@
       <div>
         <h1>🎯 Sistema Experto de Marketing Digital <span class="badge">Tau-Prolog Core</span></h1>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
-          Motor con Scoring de Incertidumbre y Auditoría "Why / How"
+          Motor Atributo-Valor con Scoring de Incertidumbre y Auditoría "Why / How"
         </p>
       </div>
       <button class="btn-reset" onclick="iniciarSesion()">🔄 Reiniciar</button>
@@ -298,13 +303,9 @@
     <main class="chat-messages" id="chatArea"></main>
 
     <footer class="chat-controls">
-      <div class="quick-actions" id="quickActions">
-        <button class="btn-action btn-yes" onclick="enviarRespuesta('si')">👍 Sí</button>
-        <button class="btn-action btn-no" onclick="enviarRespuesta('no')">👎 No</button>
-        <button class="btn-action btn-why" onclick="enviarRespuesta('porque')">❓ ¿Por qué?</button>
-      </div>
+      <div class="quick-actions" id="quickActions"></div>
       <form class="input-form" onsubmit="event.preventDefault(); enviarTextoLibre();">
-        <input type="text" id="userInput" placeholder="Escribe 'si', 'no', o 'porque'..." autocomplete="off">
+        <input type="text" id="userInput" placeholder="Selecciona una opción o escribe 'porque'..." autocomplete="off">
         <button type="submit" class="btn-send">Enviar</button>
       </form>
     </footer>
@@ -312,20 +313,141 @@
 
   <script>
     // =========================================================================
-    // BASE DE CONOCIMIENTO (PROLOG)
+    // BASE DE CONOCIMIENTO (PROLOG PARA TAU-PROLOG)
     // =========================================================================
-    const CODIGO_PROLOG = ":- dynamic(conocido/2).\n\n\n% =============================================================================\n% BASE DE CONOCIMIENTO: ESTRATEGIAS Y RECOMENDACIONES DE MARKETING DIGITAL\n% =============================================================================\n% Hechos declarativos puros y reglas de negocio sobre marketing digital.\n% Desacoplado de la lógica de inferencia, scoring o interacción de usuario.\n% =============================================================================\n\n% -----------------------------------------------------------------------------\n% regla(IdEstrategia, ListaCriterios)\n% Cada estrategia define los criterios ideales requeridos para su aplicación.\n% -----------------------------------------------------------------------------\nregla(campanas_google_search_y_sem, [\n    objetivo_ventas_directas,\n    presupuesto_medio_o_alto,\n    publico_con_alta_intencion_compra\n]).\n\nregla(publicidad_redes_sociales_meta_ads, [\n    objetivo_visibilidad_y_alcance,\n    producto_visualmente_atractivo,\n    audiencia_joven_o_general\n]).\n\nregla(marketing_de_contenidos_y_seo, [\n    objetivo_posicionamiento_largo_plazo,\n    presupuesto_bajo_o_limitado,\n    capacidad_creacion_contenido\n]).\n\nregla(email_marketing_y_fidelizacion, [\n    objetivo_retencion_y_recompra,\n    posee_base_datos_clientes,\n    producto_recompra_recurrente\n]).\n\nregla(marketing_de_influencers_microinfluencers, [\n    objetivo_visibilidad_y_alcance,\n    producto_visualmente_atractivo,\n    presupuesto_medio_o_alto\n]).\n\nregla(inbound_marketing_y_lead_nurturing, [\n    objetivo_ventas_directas,\n    ciclo_de_venta_largo,\n    capacidad_creacion_contenido\n]).\n\n% -----------------------------------------------------------------------------\n% descripcion_estrategia(IdEstrategia, NombreLegible, AccionRecomendada)\n% -----------------------------------------------------------------------------\ndescripcion_estrategia(\n    campanas_google_search_y_sem,\n    'Google Ads (Búsqueda / SEM)',\n    'Capturar clientes que ya están buscando activamente tus productos o servicios mediante anuncios en motores de búsqueda.'\n).\n\ndescripcion_estrategia(\n    publicidad_redes_sociales_meta_ads,\n    'Social Ads (Meta / Instagram & Facebook)',\n    'Generar demanda y reconocimiento de marca a través de campañas segmentadas de imágenes y videos cortos.'\n).\n\ndescripcion_estrategia(\n    marketing_de_contenidos_y_seo,\n    'SEO Orgánico y Marketing de Contenidos',\n    'Crear artículos de blog, videos educativos y optimización web para atraer tráfico continuo con bajo costo de pauta.'\n).\n\ndescripcion_estrategia(\n    email_marketing_y_fidelizacion,\n    'Email Marketing y Automatización de Retención',\n    'Diseñar flujos automáticos de nutrición, ofertas personalizadas y campañas de fidelización para clientes existentes.'\n).\n\ndescripcion_estrategia(\n    marketing_de_influencers_microinfluencers,\n    'Marketing con Micro-Influencers de Nicho',\n    'Colaborar con creadores de contenido especializados para construir confianza rápida y prueba social de tu producto.'\n).\n\ndescripcion_estrategia(\n    inbound_marketing_y_lead_nurturing,\n    'Inbound Marketing y Nutrición de Prospectos (Leads)',\n    'Ofrecer recursos descargables (lead magnets) y embudos automatizados de valor para productos o servicios complejos.'\n).\n\n% -----------------------------------------------------------------------------\n% pregunta(IdCriterio, TextoPregunta)\n% -----------------------------------------------------------------------------\npregunta(objetivo_ventas_directas,\n    '¿El objetivo principal del negocio es conseguir ventas o conversiones directas inmediatas?').\n\npregunta(objetivo_visibilidad_y_alcance,\n    '¿El objetivo principal es aumentar el alcance y reconocimiento de marca en el mercado?').\n\npregunta(objetivo_posicionamiento_largo_plazo,\n    '¿El objetivo es construir una presencia sólida y sostenible a mediano o largo plazo?').\n\npregunta(objetivo_retencion_y_recompra,\n    '¿El objetivo principal es fidelizar y maximizar el valor de los clientes actuales?').\n\npregunta(presupuesto_medio_o_alto,\n    '¿Cuentas con un presupuesto de inversión publicitaria medio o alto?').\n\npregunta(presupuesto_bajo_o_limitado,\n    '¿Cuentas con un presupuesto publicitario bajo o limitado?').\n\npregunta(publico_con_alta_intencion_compra,\n    '¿Tu público objetivo busca activamente una solución inmediata a una necesidad clara?').\n\npregunta(producto_visualmente_atractivo,\n    '¿Tu producto o servicio destaca de manera visual (fotografía, video, demostración)?').\n\npregunta(audiencia_joven_o_general,\n    '¿Tu audiencia objetivo suele consumir redes sociales de forma cotidiana?').\n\npregunta(capacidad_creacion_contenido,\n    '¿El equipo tiene tiempo o capacidad para redactar o producir contenido de valor?').\n\npregunta(posee_base_datos_clientes,\n    '¿Cuentas actualmente con correos electrónicos o contactos registrados de clientes o prospectos?').\n\npregunta(producto_recompra_recurrente,\n    '¿Tu modelo de negocio o producto permite compras repetidas o suscripciones recurrentes?').\n\npregunta(ciclo_de_venta_largo,\n    '¿El proceso de decisión de compra del cliente requiere evaluación previa o es de alto valor (B2B/servicios)?').\n";
+    const CODIGO_PROLOG = `
+:- dynamic(conocido/2).
+
+regla(campanas_google_search_y_sem, [
+    condicion(objetivo_principal, [ventas_directas]),
+    condicion(presupuesto, [medio, alto]),
+    condicion(publico_con_alta_intencion_compra, [si]),
+    condicion(comportamiento_descubrimiento, [busqueda_racional])
+]).
+
+regla(publicidad_redes_sociales_meta_ads, [
+    condicion(objetivo_principal, [visibilidad_marca, ventas_directas]),
+    condicion(comportamiento_descubrimiento, [descubrimiento_visual]),
+    condicion(audiencia_en_redes_sociales, [si])
+]).
+
+regla(marketing_de_contenidos_y_seo, [
+    condicion(objetivo_principal, [posicionamiento_largo_plazo]),
+    condicion(presupuesto, [bajo, medio]),
+    condicion(capacidad_creacion_contenido, [si]),
+    condicion(comportamiento_descubrimiento, [busqueda_racional])
+]).
+
+regla(email_marketing_y_fidelizacion, [
+    condicion(objetivo_principal, [retencion_clientes]),
+    condicion(posee_base_datos_clientes, [si]),
+    condicion(producto_recompra_recurrente, [si])
+]).
+
+regla(marketing_de_influencers_microinfluencers, [
+    condicion(objetivo_principal, [visibilidad_marca]),
+    condicion(comportamiento_descubrimiento, [descubrimiento_visual]),
+    condicion(presupuesto, [medio, alto]),
+    condicion(audiencia_en_redes_sociales, [si])
+]).
+
+regla(inbound_marketing_y_lead_nurturing, [
+    condicion(objetivo_principal, [ventas_directas, posicionamiento_largo_plazo]),
+    condicion(ciclo_de_decision, [largo_evaluativo]),
+    condicion(capacidad_creacion_contenido, [si])
+]).
+`;
 
     // =========================================================================
-    // ESTADO DEL CLIENTE Y MOTOR PROLOG
+    // DICCIONARIOS DE PREGUNTAS Y ESTRATEGIAS
     // =========================================================================
-    let session = null;
-    let condicionesConocidas = {}; // memoria en JS sincronizada: criterio -> 'si' | 'no'
-    let hipotesisActual = null;
-    let criterioActual = null;
-    let evaluacionFinalizada = false;
+    const DEFINICION_PREGUNTAS = {
+      'presupuesto': {
+        tipo: 'seleccion_unica',
+        pregunta: '¿Cuál es el nivel de presupuesto para inversión publicitaria en esta campaña?',
+        ayuda: 'Capacidad financiera destinada a pauta publicitaria.',
+        opciones: [
+          { id: 'alto', texto: 'Alto (inversión amplia)' },
+          { id: 'medio', texto: 'Medio (inversión moderada)' },
+          { id: 'bajo', texto: 'Bajo (inversión mínima)' }
+        ]
+      },
+      'objetivo_principal': {
+        tipo: 'seleccion_unica',
+        pregunta: '¿Cuál es el objetivo principal de esta campaña de marketing?',
+        ayuda: 'Meta estratégica prioritaria del negocio.',
+        opciones: [
+          { id: 'ventas_directas', texto: 'Generar conversiones directas' },
+          { id: 'visibilidad_marca', texto: 'Aumentar el reconocimiento de marca' },
+          { id: 'posicionamiento_largo_plazo', texto: 'Posicionamiento orgánico en buscadores' },
+          { id: 'retencion_clientes', texto: 'Fidelizar a los clientes existentes' }
+        ]
+      },
+      'ciclo_de_decision': {
+        tipo: 'seleccion_unica',
+        pregunta: '¿Cómo se caracteriza el proceso de decisión de compra del cliente objetivo?',
+        ayuda: 'Tiempo y esfuerzo cognitivo requerido antes de la compra.',
+        opciones: [
+          { id: 'corto_impulso', texto: 'Decisión rápida (compra inmediata)' },
+          { id: 'largo_evaluativo', texto: 'Decisión evaluativa (requiere análisis previo)' }
+        ]
+      },
+      'comportamiento_descubrimiento': {
+        tipo: 'seleccion_unica',
+        pregunta: '¿Cómo decide el cliente habitual la compra de esta oferta?',
+        ayuda: 'Estímulo que detona el interés de compra.',
+        opciones: [
+          { id: 'descubrimiento_visual', texto: 'Por atracción visual (demostración)' },
+          { id: 'busqueda_racional', texto: 'Por búsqueda activa (investigación)' }
+        ]
+      },
+      'publico_con_alta_intencion_compra': {
+        tipo: 'booleana',
+        pregunta: '¿El público objetivo busca activamente una solución en internet ante la necesidad?',
+        ayuda: 'Existencia de demanda previa en canales de búsqueda.',
+        opciones: [
+          { id: 'si', texto: 'Sí' },
+          { id: 'no', texto: 'No' }
+        ]
+      },
+      'audiencia_en_redes_sociales': {
+        tipo: 'booleana',
+        pregunta: '¿El perfil de cliente habitual utiliza redes sociales cotidianamente?',
+        ayuda: 'Presencia habitual del cliente en plataformas sociales.',
+        opciones: [
+          { id: 'si', texto: 'Sí' },
+          { id: 'no', texto: 'No' }
+        ]
+      },
+      'capacidad_creacion_contenido': {
+        tipo: 'booleana',
+        pregunta: '¿La organización dispone de recursos humanos para la creacion de contenidos?',
+        ayuda: 'Disponibilidad de equipo para generar piezas informativas.',
+        opciones: [
+          { id: 'si', texto: 'Sí' },
+          { id: 'no', texto: 'No' }
+        ]
+      },
+      'posee_base_datos_clientes': {
+        tipo: 'booleana',
+        pregunta: '¿La empresa cuenta con un registro estructurado de contactos de posibles clientes?',
+        ayuda: 'Disponibilidad de correos o números para contacto directo.',
+        opciones: [
+          { id: 'si', texto: 'Sí' },
+          { id: 'no', texto: 'No' }
+        ]
+      },
+      'producto_recompra_recurrente': {
+        tipo: 'booleana',
+        pregunta: '¿El modelo comercial contempla compras repetidas?',
+        ayuda: 'Generación de ingresos recurrentes por cliente.',
+        opciones: [
+          { id: 'si', texto: 'Sí' },
+          { id: 'no', texto: 'No' }
+        ]
+      }
+    };
 
-    // Lista de estrategias para iterar
     const ESTRATEGIAS = [
       { id: 'campanas_google_search_y_sem', nombre: 'Google Ads (Búsqueda / SEM)' },
       { id: 'publicidad_redes_sociales_meta_ads', nombre: 'Social Ads (Meta / Instagram & Facebook)' },
@@ -335,80 +457,98 @@
       { id: 'inbound_marketing_y_lead_nurturing', nombre: 'Inbound Marketing y Leads' }
     ];
 
-    const DICCIONARIO_PREGUNTAS = {
-      'objetivo_ventas_directas': '¿El objetivo principal del negocio es conseguir ventas o conversiones directas inmediatas?',
-      'objetivo_visibilidad_y_alcance': '¿El objetivo principal es aumentar el alcance y reconocimiento de marca en el mercado?',
-      'objetivo_posicionamiento_largo_plazo': '¿El objetivo es construir una presencia sólida y sostenible a mediano o largo plazo?',
-      'objetivo_retencion_y_recompra': '¿El objetivo principal es fidelizar y maximizar el valor de los clientes actuales?',
-      'presupuesto_medio_o_alto': '¿Cuentas con un presupuesto de inversión publicitaria medio o alto?',
-      'presupuesto_bajo_o_limitado': '¿Cuentas con un presupuesto publicitario bajo o limitado?',
-      'publico_con_alta_intencion_compra': '¿Tu público objetivo busca activamente una solución inmediata a una necesidad clara?',
-      'producto_visualmente_atractivo': '¿Tu producto o servicio destaca de manera visual (fotografía, video, demostración)?',
-      'audiencia_joven_o_general': '¿Tu audiencia objetivo suele consumir redes sociales de forma cotidiana?',
-      'capacidad_creacion_contenido': '¿El equipo tiene tiempo o capacidad para redactar o producir contenido de valor?',
-      'posee_base_datos_clientes': '¿Cuentas actualmente con correos electrónicos o contactos registrados de clientes o prospectos?',
-      'producto_recompra_recurrente': '¿Tu modelo de negocio o producto permite compras repetidas o suscripciones recurrentes?',
-      'ciclo_de_venta_largo': '¿El proceso de decisión de compra del cliente requiere evaluación previa o es de alto valor (B2B/servicios)?'
-    };
-
     const REGLAS_ESTRATEGIAS = {
-      'campanas_google_search_y_sem': ['objetivo_ventas_directas', 'presupuesto_medio_o_alto', 'publico_con_alta_intencion_compra'],
-      'publicidad_redes_sociales_meta_ads': ['objetivo_visibilidad_y_alcance', 'producto_visualmente_atractivo', 'audiencia_joven_o_general'],
-      'marketing_de_contenidos_y_seo': ['objetivo_posicionamiento_largo_plazo', 'presupuesto_bajo_o_limitado', 'capacidad_creacion_contenido'],
-      'email_marketing_y_fidelizacion': ['objetivo_retencion_y_recompra', 'posee_base_datos_clientes', 'producto_recompra_recurrente'],
-      'marketing_de_influencers_microinfluencers': ['objetivo_visibilidad_y_alcance', 'producto_visualmente_atractivo', 'presupuesto_medio_o_alto'],
-      'inbound_marketing_y_lead_nurturing': ['objetivo_ventas_directas', 'ciclo_de_venta_largo', 'capacidad_creacion_contenido']
+      'campanas_google_search_y_sem': [
+        { atributo: 'objetivo_principal', permitidos: ['ventas_directas'] },
+        { atributo: 'presupuesto', permitidos: ['medio', 'alto'] },
+        { atributo: 'publico_con_alta_intencion_compra', permitidos: ['si'] },
+        { atributo: 'comportamiento_descubrimiento', permitidos: ['busqueda_racional'] }
+      ],
+      'publicidad_redes_sociales_meta_ads': [
+        { atributo: 'objetivo_principal', permitidos: ['visibilidad_marca', 'ventas_directas'] },
+        { atributo: 'comportamiento_descubrimiento', permitidos: ['descubrimiento_visual'] },
+        { atributo: 'audiencia_en_redes_sociales', permitidos: ['si'] }
+      ],
+      'marketing_de_contenidos_y_seo': [
+        { atributo: 'objetivo_principal', permitidos: ['posicionamiento_largo_plazo'] },
+        { atributo: 'presupuesto', permitidos: ['bajo', 'medio'] },
+        { atributo: 'capacidad_creacion_contenido', permitidos: ['si'] },
+        { atributo: 'comportamiento_descubrimiento', permitidos: ['busqueda_racional'] }
+      ],
+      'email_marketing_y_fidelizacion': [
+        { atributo: 'objetivo_principal', permitidos: ['retencion_clientes'] },
+        { atributo: 'posee_base_datos_clientes', permitidos: ['si'] },
+        { atributo: 'producto_recompra_recurrente', permitidos: ['si'] }
+      ],
+      'marketing_de_influencers_microinfluencers': [
+        { atributo: 'objetivo_principal', permitidos: ['visibilidad_marca'] },
+        { atributo: 'comportamiento_descubrimiento', permitidos: ['descubrimiento_visual'] },
+        { atributo: 'presupuesto', permitidos: ['medio', 'alto'] },
+        { atributo: 'audiencia_en_redes_sociales', permitidos: ['si'] }
+      ],
+      'inbound_marketing_y_lead_nurturing': [
+        { atributo: 'objetivo_principal', permitidos: ['ventas_directas', 'posicionamiento_largo_plazo'] },
+        { atributo: 'ciclo_de_decision', permitidos: ['largo_evaluativo'] },
+        { atributo: 'capacidad_creacion_contenido', permitidos: ['si'] }
+      ]
     };
 
     const DESCRIPCIONES = {
       'campanas_google_search_y_sem': {
         nombre: 'Google Ads (Búsqueda / SEM)',
-        accion: 'Capturar clientes que ya están buscando activamente tus productos mediante anuncios en motores de búsqueda.'
+        accion: '<b>Qué hacer:</b> Configura anuncios orientados a términos exactos de compra (ej. "comprar [producto]") y dirige a los usuarios a una página de aterrizaje clara con llamada a la acción directa.'
       },
       'publicidad_redes_sociales_meta_ads': {
         nombre: 'Social Ads (Meta / Instagram & Facebook)',
-        accion: 'Generar demanda y reconocimiento de marca a través de campañas segmentadas de imágenes y videos.'
+        accion: '<b>Qué hacer:</b> Diseña anuncios en video e imágenes mostrando tu producto en acción, segmenta tu audiencia por intereses y lanza promociones directas con enlace a tu tienda o WhatsApp.'
       },
       'marketing_de_contenidos_y_seo': {
         nombre: 'SEO Orgánico y Marketing de Contenidos',
-        accion: 'Crear artículos de blog y recursos educativos para posicionar en motores de búsqueda a largo plazo con bajo costo de pauta.'
+        accion: '<b>Qué hacer:</b> Publica artículos o videos resolviendo las dudas más habituales de tus clientes, optimiza los títulos con palabras clave de búsqueda y atrae tráfico orgánico continuo sin costo de pauta.'
       },
       'email_marketing_y_fidelizacion': {
         nombre: 'Email Marketing y Fidelización',
-        accion: 'Diseñar flujos automáticos de nutrición y promociones personalizadas para clientes registrados.'
+        accion: '<b>Qué hacer:</b> Envía a tus contactos de clientes una publicidad, novedad o promoción exclusiva sobre tu producto para incentivar compras repetidas y reactivar clientes inactivos.'
       },
       'marketing_de_influencers_microinfluencers': {
         nombre: 'Marketing con Micro-Influencers de Nicho',
-        accion: 'Colaborar con creadores especializados para construir confianza rápida y prueba social.'
+        accion: '<b>Qué hacer:</b> Contacta a 5-10 creadores de contenido de tu sector, envíales muestras de tu producto y pídeles reseñas auténticas y demostraciones en video para generar confianza rápida.'
       },
       'inbound_marketing_y_lead_nurturing': {
         nombre: 'Inbound Marketing y Nutrición de Leads',
-        accion: 'Crear embudos automatizados de captación y valor para productos o servicios complejos.'
+        accion: '<b>Qué hacer:</b> Diseña un recurso descargable gratuito (guía, plantilla o caso de estudio) para captar correos de prospectos y envíales una secuencia automatizada de valor antes de ofertarles.'
       }
     };
 
     // =========================================================================
-    // INICIALIZACIÓN
+    // ESTADO DEL CLIENTE Y MOTOR PROLOG
     // =========================================================================
+    let session = null;
+    let condicionesConocidas = {}; // atributo -> valor registrado
+    let hipotesisActual = null;
+    let atributoActual = null;
+    let condicionActualObj = null;
+    let evaluacionFinalizada = false;
+
     function iniciarSesion() {
       condicionesConocidas = {};
       hipotesisActual = null;
-      criterioActual = null;
+      atributoActual = null;
+      condicionActualObj = null;
       evaluacionFinalizada = false;
 
       const chatArea = document.getElementById("chatArea");
       chatArea.innerHTML = "";
       document.getElementById("quickActions").style.display = "flex";
 
-      // Inicializar Tau-Prolog
       session = pl.create();
       session.consult(CODIGO_PROLOG, {
         success: function() {
           agregarMensajeBot(`👋 ¡Hola! Soy tu <b>Asistente Experto en Marketing Digital</b>.<br><br>
-            Determinaré la mejor estrategia para tu empresa evaluando las hipótesis en tiempo real con <b>Tau-Prolog</b>.<br>
+            Determinaré la mejor estrategia para tu empresa evaluando las hipótesis en tiempo real con el modelo <b>Atributo-Valor</b>.<br>
             <ul>
-              <li>Puedes responder <b>Sí</b> o <b>No</b>.</li>
-              <li>O pulsar <b>¿Por qué?</b> (o escribir "porque") para auditar la hipótesis activa.</li>
+              <li>Puedes hacer clic en los botones de opción o escribir en el campo de texto.</li>
+              <li>Pulsa <b>❓ ¿Por qué?</b> en cualquier momento para saber qué hipótesis está evaluando el sistema.</li>
             </ul>`);
           siguientePasoInferencia();
         },
@@ -418,41 +558,78 @@
       });
     }
 
-    // =========================================================================
-    // MOTOR DE INFERENCIA PASO A PASO (FRONTEND PROLOG)
-    // =========================================================================
     function siguientePasoInferencia() {
       if (evaluacionFinalizada) return;
 
-      // Buscar siguiente condición no conocida en las reglas de las estrategias
+      // Buscar el siguiente atributo no conocido
       for (const est of ESTRATEGIAS) {
         const condiciones = REGLAS_ESTRATEGIAS[est.id];
         for (const cond of condiciones) {
-          if (condicionesConocidas[cond] === undefined) {
+          if (condicionesConocidas[cond.atributo] === undefined) {
             hipotesisActual = est;
-            criterioActual = cond;
-            const textoPregunta = DICCIONARIO_PREGUNTAS[cond] || `¿Aplica el criterio ${cond}?`;
+            atributoActual = cond.atributo;
+            condicionActualObj = cond;
+
+            const def = DEFINICION_PREGUNTAS[atributoActual];
+            const textoPregunta = def ? def.pregunta : `¿Cuál es el valor para ${atributoActual}?`;
+
             agregarMensajeBot(textoPregunta);
+            actualizarBotonesAccion(def);
             return;
           }
         }
       }
 
-      // Si todas las condiciones relevantes fueron evaluadas, calcular scoring final
       finalizarEvaluacion();
     }
 
-    function responderCriterio(respuesta) {
-      if (evaluacionFinalizada || !criterioActual) return;
+    function actualizarBotonesAccion(def) {
+      const quickActions = document.getElementById("quickActions");
+      quickActions.innerHTML = "";
 
-      condicionesConocidas[criterioActual] = respuesta;
+      if (!def) return;
 
-      // Registrar aserto en Tau-Prolog
-      session.query(`assertz(conocido(${criterioActual}, ${respuesta})).`, {
+      if (def.tipo === 'booleana') {
+        const btnSi = document.createElement("button");
+        btnSi.className = "btn-action btn-yes";
+        btnSi.innerHTML = "👍 Sí";
+        btnSi.onclick = () => enviarRespuesta('si', 'Sí');
+
+        const btnNo = document.createElement("button");
+        btnNo.className = "btn-action btn-no";
+        btnNo.innerHTML = "👎 No";
+        btnNo.onclick = () => enviarRespuesta('no', 'No');
+
+        quickActions.appendChild(btnSi);
+        quickActions.appendChild(btnNo);
+      } else {
+        def.opciones.forEach(opt => {
+          const btn = document.createElement("button");
+          btn.className = "btn-action btn-opt";
+          btn.textContent = opt.texto;
+          btn.onclick = () => enviarRespuesta(opt.id, opt.texto);
+          quickActions.appendChild(btn);
+        });
+      }
+
+      const btnWhy = document.createElement("button");
+      btnWhy.className = "btn-action btn-why";
+      btnWhy.innerHTML = "❓ ¿Por qué?";
+      btnWhy.onclick = () => enviarRespuesta('porque', '¿Por qué me preguntas esto?');
+      quickActions.appendChild(btnWhy);
+    }
+
+    function responderAtributo(valorId) {
+      if (evaluacionFinalizada || !atributoActual) return;
+
+      condicionesConocidas[atributoActual] = valorId;
+
+      session.query(`assertz(conocido(${atributoActual}, ${valorId})).`, {
         success: function() {
           session.answer({
             success: function() {
-              criterioActual = null;
+              atributoActual = null;
+              condicionActualObj = null;
               siguientePasoInferencia();
             }
           });
@@ -460,23 +637,20 @@
       });
     }
 
-    // =========================================================================
-    // MECANISMO "WHY"
-    // =========================================================================
     function mostrarExplicacionWhy() {
-      if (!hipotesisActual || !criterioActual) return;
+      if (!hipotesisActual || !condicionActualObj) return;
+
+      const def = DEFINICION_PREGUNTAS[condicionActualObj.atributo];
       const htmlWhy = `
         <div style="font-weight: 600; margin-bottom: 4px;">🔍 Justificación "Why":</div>
         Estoy evaluando la viabilidad de la estrategia: <b>"${hipotesisActual.nombre}"</b>.<br>
-        Para contrastar esta hipótesis, requiero verificar el criterio:<br>
-        <span class="tag-prolog">[${criterioActual}]</span>: <i>"${DICCIONARIO_PREGUNTAS[criterioActual]}"</i>.
+        Para validar esta hipótesis, requiero conocer el parámetro: <b>${condicionActualObj.atributo}</b>.<br>
+        <i>${def ? def.ayuda : ''}</i><br>
+        Los valores que favorecen esta recomendación son: <span class="tag-prolog">[${condicionActualObj.permitidos.join(', ')}]</span>.
       `;
       agregarMensajeWhy(htmlWhy);
     }
 
-    // =========================================================================
-    // SCORING Y AUDITORÍA "HOW"
-    // =========================================================================
     function finalizarEvaluacion() {
       evaluacionFinalizada = true;
       document.getElementById("quickActions").style.display = "none";
@@ -489,10 +663,18 @@
         const noCumplidas = [];
 
         condiciones.forEach(c => {
-          if (condicionesConocidas[c] === 'si') {
-            cumplidas.push(c);
+          const valorActual = condicionesConocidas[c.atributo];
+          const cumple = c.permitidos.includes(valorActual);
+          const detalle = {
+            atributo: c.atributo,
+            valorActual: valorActual,
+            permitidos: c.permitidos
+          };
+
+          if (cumple) {
+            cumplidas.push(detalle);
           } else {
-            noCumplidas.push(c);
+            noCumplidas.push(detalle);
           }
         });
 
@@ -507,7 +689,6 @@
         });
       }
 
-      // Ordenar por score descendente
       ranking.sort((a, b) => b.score - a.score);
 
       const ganadora = ranking[0];
@@ -521,7 +702,7 @@
         agregarMensajeBot(`
           <div class="msg-result" style="border-color: #ef4444; background-color: #450a0a;">
             <h2>❌ Sin recomendación viable</h2>
-            <p>Todas las respuestas registradas resultaron negativas (0% de coincidencia). Te recomendamos replantear tus objetivos de marketing.</p>
+            <p>Todas las respuestas registradas resultaron incompatibles (0% de coincidencia). Te recomendamos replantear tus metas y presupuesto de marketing.</p>
           </div>
         `);
         return;
@@ -539,15 +720,14 @@
         `;
       }
 
-      // Trazabilidad HOW
       let howHtml = "";
       rankingCompleto.filter(r => r.score > 0).forEach(r => {
         howHtml += `
-          <div style="margin-top: 10px; padding: 8px 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+          <div style="margin-top: 10px; padding: 8px 12px; background: rgba(0,0,0,0.25); border-radius: 8px;">
             <b>${r.nombre} (${r.score}% de coincidencia):</b>
             <ul class="how-list">
-              ${r.cumplidas.map(c => `<li><span class="check">✓</span> ${DICCIONARIO_PREGUNTAS[c]}</li>`).join('')}
-              ${r.noCumplidas.map(c => `<li><span class="cross">✗</span> ${DICCIONARIO_PREGUNTAS[c]}</li>`).join('')}
+              ${r.cumplidas.map(c => `<li><span class="check">✓</span> <b>${c.atributo}:</b> "${c.valorActual}" coincide con [${c.permitidos.join(', ')}]</li>`).join('')}
+              ${r.noCumplidas.map(c => `<li><span class="cross">✗</span> <b>${c.atributo}:</b> "${c.valorActual || 'no respondido'}" no coincide con [${c.permitidos.join(', ')}]</li>`).join('')}
             </ul>
           </div>
         `;
@@ -571,9 +751,6 @@
       agregarMensajeBot(resultadoHtml);
     }
 
-    // =========================================================================
-    // GESTIÓN DE UI / MENSAJES
-    // =========================================================================
     function agregarMensajeBot(html) {
       const chatArea = document.getElementById("chatArea");
       const msg = document.createElement("div");
@@ -601,13 +778,13 @@
       chatArea.scrollTop = chatArea.scrollHeight;
     }
 
-    function enviarRespuesta(valor) {
-      if (valor === 'porque') {
+    function enviarRespuesta(valorId, textoPresentar) {
+      if (valorId === 'porque') {
         agregarMensajeUser("¿Por qué me preguntas esto?");
         mostrarExplicacionWhy();
       } else {
-        agregarMensajeUser(valor === 'si' ? "Sí" : "No");
-        responderCriterio(valor);
+        agregarMensajeUser(textoPresentar || valorId);
+        responderAtributo(valorId);
       }
     }
 
@@ -615,20 +792,43 @@
       const input = document.getElementById("userInput");
       const valor = input.value.trim().toLowerCase();
       input.value = "";
-      if (!valor) return;
+      if (!valor || !atributoActual) return;
 
-      if (['si', 's', 'yes', 'y', 'sí'].includes(valor)) {
-        enviarRespuesta('si');
-      } else if (['no', 'n'].includes(valor)) {
-        enviarRespuesta('no');
-      } else if (['porque', 'por que', 'por qué', 'porqué', 'why', 'w', '?'].includes(valor)) {
-        enviarRespuesta('porque');
+      if (['porque', 'por que', 'por qué', 'porqué', 'why', 'w', '?'].includes(valor)) {
+        enviarRespuesta('porque', '¿Por qué me preguntas esto?');
+        return;
+      }
+
+      const def = DEFINICION_PREGUNTAS[atributoActual];
+      if (!def) return;
+
+      if (def.tipo === 'booleana') {
+        if (['si', 's', 'yes', 'y', 'sí', '1'].includes(valor)) {
+          enviarRespuesta('si', 'Sí');
+        } else if (['no', 'n', '2', '0'].includes(valor)) {
+          enviarRespuesta('no', 'No');
+        } else {
+          agregarMensajeBot('⚠️ Entrada no reconocida. Escribe <b>"si"</b>, <b>"no"</b> o <b>"porque"</b>.');
+        }
       } else {
-        agregarMensajeBot('⚠️ Entrada no reconocida. Escribe <b>"si"</b>, <b>"no"</b> o <b>"porque"</b>.');
+        // Verificar por número de opción (1, 2, ...)
+        const num = parseInt(valor, 10);
+        if (!isNaN(num) && num >= 1 && num <= def.opciones.length) {
+          const opt = def.opciones[num - 1];
+          enviarRespuesta(opt.id, opt.texto);
+          return;
+        }
+
+        // Verificar por texto o id
+        const opt = def.opciones.find(o => o.id === valor || o.texto.toLowerCase().includes(valor));
+        if (opt) {
+          enviarRespuesta(opt.id, opt.texto);
+        } else {
+          agregarMensajeBot(`⚠️ Opción no reconocida. Elige una opción válida o escribe el número (1 al ${def.opciones.length}).`);
+        }
       }
     }
 
-    // Iniciar al cargar
     window.addEventListener("DOMContentLoaded", iniciarSesion);
   </script>
 </body>
